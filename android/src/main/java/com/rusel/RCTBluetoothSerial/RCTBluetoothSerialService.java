@@ -37,7 +37,7 @@ class RCTBluetoothSerialService {
     private BluetoothAdapter mAdapter;
     private ConnectThread mConnectThread;
     private ConnectedThread mConnectedThread;
-    private AcceptThread mAcceptThread;
+    // private AcceptThread mAcceptThread;
     //    private AcceptThread mAcceptThread;
     private RCTBluetoothSerialModule mModule;
     private String mState;
@@ -77,10 +77,10 @@ class RCTBluetoothSerialService {
         }
 
         setState(STATE_LISTEN);
-        if (mAcceptThread == null) {
-            mAcceptThread = new AcceptThread();
-            mAcceptThread.start();
-        }
+        // if (mAcceptThread == null) {
+        //     mAcceptThread = new AcceptThread();
+        //     mAcceptThread.start();
+        // }
     }
     /********************************************/
     /** Methods available within whole package **/
@@ -144,7 +144,7 @@ class RCTBluetoothSerialService {
 
         cancelConnectThread();
         cancelConnectedThread();
-        cancelAcceptThread();
+        // cancelAcceptThread();
         setState(STATE_NONE);
     }
 
@@ -182,7 +182,7 @@ class RCTBluetoothSerialService {
 
         cancelConnectThread(); // Cancel any thread attempting to make a connection
         cancelConnectedThread(); // Cancel any thread currently running a connection
-        cancelAcceptThread();
+        // cancelAcceptThread();
         // Start the thread to manage the connection and perform transmissions
         mConnectedThread = new ConnectedThread(socket);
         mConnectedThread.start();
@@ -231,12 +231,12 @@ class RCTBluetoothSerialService {
     /**
      * Cancel accept thread
      */
-    private void cancelAcceptThread() {
-        if (mAcceptThread != null) {
-            mAcceptThread.cancel();
-            mAcceptThread = null;
-        }
-    }
+    // private void cancelAcceptThread() {
+    //     if (mAcceptThread != null) {
+    //         mAcceptThread.cancel();
+    //         mAcceptThread = null;
+    //     }
+    // }
 
     /**
      * This thread runs while attempting to make an outgoing connection
@@ -394,66 +394,66 @@ class RCTBluetoothSerialService {
         }
     }
 
-    private class AcceptThread extends Thread {
-        private BluetoothServerSocket serverSocket;
+    // private class AcceptThread extends Thread {
+    //     private BluetoothServerSocket serverSocket;
 
-        public AcceptThread() {
-            BluetoothServerSocket tmp = null;
+    //     public AcceptThread() {
+    //         BluetoothServerSocket tmp = null;
 
-            // Get a BluetoothSocket for a connection with the given BluetoothDevice
-            try {
-                tmp = mAdapter.listenUsingInsecureRfcommWithServiceRecord("com.agmostudio.epod", UUID_SPP);
-            } catch (Exception e) {
-                mModule.onError(e);
-                Log.e(TAG, "Accept thread 0: Socket create() failed", e);
-            }
-            serverSocket = tmp;
-        }
+    //         // Get a BluetoothSocket for a connection with the given BluetoothDevice
+    //         try {
+    //             tmp = mAdapter.listenUsingInsecureRfcommWithServiceRecord("com.agmostudio.epod", UUID_SPP);
+    //         } catch (Exception e) {
+    //             mModule.onError(e);
+    //             Log.e(TAG, "Accept thread 0: Socket create() failed", e);
+    //         }
+    //         serverSocket = tmp;
+    //     }
 
-        public void run() {
-            if (D) Log.d(TAG, "BEGIN mConnectThread");
-            setName("AcceptThread");
-            BluetoothSocket socket = null;
-            // Make a connection to the BluetoothSocket
-            while (mState != STATE_CONNECTED) {
-                try {
-                    socket = serverSocket.accept();
-                } catch (IOException e) {
-                    mModule.onError(e);
-                    Log.e(TAG, "accept thread 1: Socket create() failed", e);
-                    break;
-                }
-                if (socket != null) {
-                    synchronized (RCTBluetoothSerialService.this) {
-                        switch (mState) {
-                            case STATE_CONNECTING:
-                            case STATE_LISTEN:
-                                connectionSuccess(socket, socket.getRemoteDevice());
-                                break;
-                            case STATE_CONNECTED:
-                                try {
-                                    socket.close();
-                                } catch (IOException e) {
-                                    mModule.onError(e);
-                                    Log.e(TAG, "accept thread: Socket create() failed", e);
-                                }
-                                break;
+    //     public void run() {
+    //         if (D) Log.d(TAG, "BEGIN mConnectThread");
+    //         setName("AcceptThread");
+    //         BluetoothSocket socket = null;
+    //         // Make a connection to the BluetoothSocket
+    //         while (mState != STATE_CONNECTED) {
+    //             try {
+    //                 socket = serverSocket.accept();
+    //             } catch (IOException e) {
+    //                 mModule.onError(e);
+    //                 Log.e(TAG, "accept thread 1: Socket create() failed", e);
+    //                 break;
+    //             }
+    //             if (socket != null) {
+    //                 synchronized (RCTBluetoothSerialService.this) {
+    //                     switch (mState) {
+    //                         case STATE_CONNECTING:
+    //                         case STATE_LISTEN:
+    //                             connectionSuccess(socket, socket.getRemoteDevice());
+    //                             break;
+    //                         case STATE_CONNECTED:
+    //                             try {
+    //                                 socket.close();
+    //                             } catch (IOException e) {
+    //                                 mModule.onError(e);
+    //                                 Log.e(TAG, "accept thread: Socket create() failed", e);
+    //                             }
+    //                             break;
 
-                        }
-                    }
-                }
-            }
-        }
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
 
-        void cancel() {
-            try {
-                serverSocket.close();
-            } catch (Exception e) {
-                Log.e(TAG, "accept thread: close() of connect socket failed", e);
-                mModule.onError(e);
-            }
-        }
-    }
+    //     void cancel() {
+    //         try {
+    //             serverSocket.close();
+    //         } catch (Exception e) {
+    //             Log.e(TAG, "accept thread: close() of connect socket failed", e);
+    //             mModule.onError(e);
+    //         }
+    //     }
+    // }
 
 //    private class AcceptThread extends Thread {
 //        private BluetoothServerSocket serverSocket;
